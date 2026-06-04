@@ -1,0 +1,23 @@
+name: Sync Fork from Upstream
+
+# 每 6 小时把上游 shareAI-lab/learn-claude-code 的更新同步到本 fork。
+# 使用 fast-forward(不加 --force):若 fork 的 main 与上游产生分叉,本次同步会失败而非覆盖,
+# 以保护你在 fork 上可能存在的提交。每次运行结果可在仓库的 Actions 标签页查看。
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'   # UTC 时间,避开整点以降低 GitHub 排队延迟(每 6 小时一次)
+  workflow_dispatch:          # 允许在 Actions 页面手动触发
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: Sync main with upstream
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync fork with parent repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh repo sync ${{ github.repository }} --branch main
