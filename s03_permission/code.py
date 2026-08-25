@@ -63,7 +63,7 @@ SYSTEM = f"You are a coding agent at {WORKDIR}. All destructive operations requi
 def run_bash(command: str) -> str:
     try:
         r = subprocess.run(command, shell=True, cwd=WORKDIR,
-                           capture_output=True, text=True, timeout=120)
+                           capture_output=True, text=True, errors="replace", timeout=120)
         out = (r.stdout + r.stderr).strip()
         return out[:50000] if out else "(no output)"
     except subprocess.TimeoutExpired:
@@ -232,7 +232,8 @@ if __name__ == "__main__":
     history = []
     while True:
         try:
-            query = input("\033[36ms03 >> \033[0m")
+            # \001/\002 tell Readline the ANSI escapes have zero display width.
+            query = input("\001\033[36m\002s03 >> \001\033[0m\002")
         except (EOFError, KeyboardInterrupt):
             break
         if query.strip().lower() in ("q", "exit", ""):
